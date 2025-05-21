@@ -1,11 +1,18 @@
-import express from 'express';
-const app = express();
-const port = 3000;
+import {code, echo, start, start_new_chat, view_chat_list} from "./commands/commands";
+import bot from "./utils/botInit";
+import TelegramBot from "node-telegram-bot-api";
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
 
-app.listen(port, () => {
-    return console.log(`Express is listening at http://localhost:${port}`);
-});
+
+
+//ON COMMANDS
+bot.onText(/\/start/, start)
+
+bot.onText(/\/echo (.+)/, echo)
+
+bot.onText(/\/code/, code as (msg: TelegramBot.Message, match: RegExpExecArray | null) => void)
+
+bot.onText(/📝Start New Chat📝/, start_new_chat)
+
+bot.onText(/📂View Previous Chats📂/, view_chat_list)
+
