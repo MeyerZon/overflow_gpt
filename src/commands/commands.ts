@@ -3,8 +3,15 @@ import bot from "../utils/botInit";
 import db from "../utils/database";
 
 
-export function start(msg: TelegramBot.Message, match: RegExpExecArray | null): void{
-    // const menu_btn = new TelegramBot.
+export async function start(msg: TelegramBot.Message, match: RegExpExecArray | null): Promise<void>{
+    const user = await db.query("SELECT * FROM users WHERE telegram_id = $1", [msg.chat.id])
+    console.log(user.rows)
+
+    if (user.rows.length === 0) {
+        bot.sendMessage(msg.chat.id, "Welcome to the StackOverflow Bot! It's seems you are new here?", {reply_markup:{keyboard:[[{text:"📝Start New Chat📝", },{text:"📂View Previous Chats📂"}]]}})
+        await db.query(`INSERT INTO users (telegram_id, last_active_at) VALUES ($1, NOW()) ON CONFLICT (telegram_id) DO NOTHING`, [Number(msg.chat.id)])
+        return
+    }
 
     bot.sendMessage(msg.chat.id, "Welcome to the StackOverflow Bot", {reply_markup:{keyboard:[[{text:"📝Start New Chat📝", },{text:"📂View Previous Chats📂"}]]}})
 }
